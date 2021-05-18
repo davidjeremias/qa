@@ -1,7 +1,6 @@
 package com.u2d.qa.service;
 
 import com.u2d.qa.entity.Usuario;
-import liquibase.pro.packaged.U;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -28,10 +27,10 @@ public class AssertTest {
         Assertions.assertTrue("bola".equalsIgnoreCase("Bola"));
 
         //Objetos
-        Usuario u1 = new Usuario("David");
-        Usuario u2 = new Usuario("David");
+        Usuario u1 = new Usuario(1L,"David");
+        Usuario u2 = new Usuario(2L,"David");
         Usuario u3 = null;
-        Assertions.assertEquals(u1, u2);
+        Assertions.assertNotEquals(u1, u2);
         Assertions.assertNotNull(u2);
         Assertions.assertNull(u3);
 

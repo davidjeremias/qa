@@ -5,7 +5,10 @@ import com.u2d.qa.entity.Locacao;
 import com.u2d.qa.entity.Usuario;
 import com.u2d.qa.exception.FilmeSemEstoqueException;
 import com.u2d.qa.exception.LocadoraException;
+import com.u2d.qa.repository.LocacaoRepository;
 import com.u2d.qa.util.DataUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -14,7 +17,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.u2d.qa.util.DataUtils.adicionarDias;
 
+@Service
 public class LocacaoService {
+
+    @Autowired
+    private LocacaoRepository repository;
 
     public Locacao alugarFilme(Usuario usuario, List<Filme> filmes) throws LocadoraException, FilmeSemEstoqueException {
         if (usuario == null)
@@ -43,6 +50,7 @@ public class LocacaoService {
                 .dataRetorno(dataEntrega)
                 .valor(valorTotal)
                 .build();
+        repository.save(locacao);
         return locacao;
     }
 

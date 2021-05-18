@@ -1,15 +1,23 @@
 package com.u2d.qa.service;
 
+import com.u2d.qa.builders.UsuarioBuilder;
 import com.u2d.qa.entity.Filme;
 import com.u2d.qa.entity.Locacao;
 import com.u2d.qa.entity.Usuario;
 import com.u2d.qa.exception.FilmeSemEstoqueException;
 import com.u2d.qa.exception.LocadoraException;
+import com.u2d.qa.matchers.DiaSemanaMatcher;
+import com.u2d.qa.matchers.Matchers;
+import com.u2d.qa.repository.LocacaoRepository;
 import com.u2d.qa.util.DataUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.*;
 
@@ -19,16 +27,21 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
+@ExtendWith(MockitoExtension.class)
 public class LocacaoServiceTest {
 
-    private static LocacaoService locacaoService;
+    @InjectMocks
+    private LocacaoService locacaoService;
+
+    @Mock
+    private LocacaoRepository repository;
+
     private static Usuario usuario;
     private static List<Filme> filmes;
 
     @BeforeAll
     public static void setup() {
-        locacaoService = new LocacaoService();
-        usuario = new Usuario("David");
+        usuario = UsuarioBuilder.umUsuario().agora();
         filmes = Arrays.asList(Filme.builder()
                 .nome("De volta para o futuro")
                 .estoque(2)
@@ -98,9 +111,6 @@ public class LocacaoServiceTest {
         Locacao locacao = locacaoService.alugarFilme(usuario, filmes);
 
         //validação
-        boolean isSegunda = DataUtils.verificarDiaSemana(locacao.getDataRetorno(), Calendar.MONDAY);
-        assertTrue(isSegunda);
-        //assertThat(locacao.getDataRetorno(), caiEm(Calendar.MONDAY));
-        //assertThat(locacao.getDataRetorno(), caiEmUmaSegunda());
+        assertThat(locacao.getDataRetorno(), Matchers.caiNaSegunda());
     }
 }

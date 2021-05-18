@@ -1,17 +1,16 @@
 package com.u2d.qa.service;
 
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.junit.jupiter.MockitoExtension;
 
+@ExtendWith(MockitoExtension.class)
 public class CalculadoraServiceTest {
 
-    private static CalculadoraService calculadoraService;
-
-    @BeforeAll
-    public static void setup() {
-        calculadoraService = new CalculadoraService();
-    }
+    @InjectMocks
+    private CalculadoraService calculadoraService;
 
     @Test
     public void deveSomarDoisValores() {
