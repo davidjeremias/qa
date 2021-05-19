@@ -13,6 +13,7 @@ public class UsuarioBuilder {
         UsuarioBuilder builder = new UsuarioBuilder();
         builder.usuario = new Usuario();
         builder.usuario.setNome("David");
+        builder.usuario.setNegativado(false);
         return builder;
     }
 

@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.*;
@@ -26,6 +27,7 @@ import static com.u2d.qa.util.DataUtils.obterDataComDiferencaDias;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class LocacaoServiceTest {
@@ -35,6 +37,9 @@ public class LocacaoServiceTest {
 
     @Mock
     private LocacaoRepository repository;
+
+    @Mock
+    private SPCService spcService;
 
     private static Usuario usuario;
     private static List<Filme> filmes;
@@ -55,7 +60,7 @@ public class LocacaoServiceTest {
         //acão
         Locacao locacao = locacaoService.alugarFilme(usuario, filmes);
 
-        //validação
+        //verificação
         assertThat(locacao.getValor(), is(15.99));
         assertThat(isMesmaData(locacao.getDataLocacao(), new Date()), is(true));
         assertThat(isMesmaData(locacao.getDataRetorno(), obterDataComDiferencaDias(1)), is(true));
@@ -74,7 +79,7 @@ public class LocacaoServiceTest {
             locacaoService.alugarFilme(usuario, filmes1);
         });
 
-        //validação
+        //verificação
         assertEquals("Filme sem estoque", exception.getMessage());
     }
 
@@ -85,7 +90,7 @@ public class LocacaoServiceTest {
             locacaoService.alugarFilme(null, filmes);
         });
 
-        //validação
+        //verificação
         assertEquals("Usuário vazio", exception.getMessage());
     }
 
@@ -99,7 +104,7 @@ public class LocacaoServiceTest {
             locacaoService.alugarFilme(usuario, filmesVazios);
         });
 
-        //validação
+        //verificação
         assertEquals("Filme vazio", exception.getMessage());
     }
 
@@ -110,7 +115,21 @@ public class LocacaoServiceTest {
         //ação
         Locacao locacao = locacaoService.alugarFilme(usuario, filmes);
 
-        //validação
+        //verificação
         assertThat(locacao.getDataRetorno(), Matchers.caiNaSegunda());
+    }
+
+    @Test
+    public void naoDeveAlugarFilmeParaNegativado() throws LocadoraException {
+        //cenario
+        when(spcService.possuiNegativacao(usuario)).thenReturn(true);
+
+        //ação
+        LocadoraException exception = assertThrows(LocadoraException.class, () -> {
+            locacaoService.alugarFilme(usuario, filmes);
+        });
+
+        //verificação
+        assertEquals("Usuário Negativado", exception.getMessage());
     }
 }

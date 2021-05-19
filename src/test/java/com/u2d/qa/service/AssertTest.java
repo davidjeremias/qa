@@ -27,8 +27,8 @@ public class AssertTest {
         Assertions.assertTrue("bola".equalsIgnoreCase("Bola"));
 
         //Objetos
-        Usuario u1 = new Usuario(1L,"David");
-        Usuario u2 = new Usuario(2L,"David");
+        Usuario u1 = new Usuario(1L,"David", false);
+        Usuario u2 = new Usuario(2L,"David", false);
         Usuario u3 = null;
         Assertions.assertNotEquals(u1, u2);
         Assertions.assertNotNull(u2);

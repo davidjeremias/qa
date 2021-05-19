@@ -31,11 +31,14 @@ public class CalculoValorLocacaoTest {
     @Mock
     private LocacaoRepository repository;
 
+    @Mock
+    private SPCService spcService;
+
     private static Usuario usuario;
 
     @BeforeAll
     public static void setup() {
-        usuario = new Usuario(1L,"David");
+        usuario = new Usuario(1L,"David", false);
     }
 
     private static Filme filme1 = new Filme(1L,"MPV1", 2, 4.0);

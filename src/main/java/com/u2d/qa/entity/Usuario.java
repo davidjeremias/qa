@@ -11,15 +11,18 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "usuario")
+@Table(name = "USUARIO")
 public class Usuario {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "idUsuario")
+    @Column(name = "ID")
     @EqualsAndHashCode.Include
     private Long id;
 
-    @Column(name = "nome")
+    @Column(name = "NOME")
     private String nome;
+
+    @Column(name = "NEGATIVADO")
+    private Boolean negativado;
 }

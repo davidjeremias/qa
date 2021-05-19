@@ -23,6 +23,9 @@ public class LocacaoService {
     @Autowired
     private LocacaoRepository repository;
 
+    @Autowired
+    private SPCService spcService;
+
     public Locacao alugarFilme(Usuario usuario, List<Filme> filmes) throws LocadoraException, FilmeSemEstoqueException {
         if (usuario == null)
             throw new LocadoraException("Usuário vazio");
@@ -37,6 +40,9 @@ public class LocacaoService {
             aplicaDesconto(i, filme);
             valorTotal += filme.getPrecoLocacao();
         }
+
+        if (spcService.possuiNegativacao(usuario))
+            throw new LocadoraException("Usuário Negativado");
 
         Date dataEntrega = new Date();
         dataEntrega = adicionarDias(dataEntrega, 1);
