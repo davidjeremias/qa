@@ -1,32 +1,33 @@
 package com.u2d.qa.service;
 
+import com.u2d.qa.builders.LocacaoBuilder;
 import com.u2d.qa.builders.UsuarioBuilder;
 import com.u2d.qa.entity.Filme;
 import com.u2d.qa.entity.Locacao;
 import com.u2d.qa.entity.Usuario;
 import com.u2d.qa.exception.FilmeSemEstoqueException;
 import com.u2d.qa.exception.LocadoraException;
-import com.u2d.qa.matchers.DiaSemanaMatcher;
 import com.u2d.qa.matchers.Matchers;
 import com.u2d.qa.repository.LocacaoRepository;
 import com.u2d.qa.util.DataUtils;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.*;
 
+import static com.u2d.qa.builders.LocacaoBuilder.*;
+import static com.u2d.qa.builders.UsuarioBuilder.*;
 import static com.u2d.qa.util.DataUtils.isMesmaData;
 import static com.u2d.qa.util.DataUtils.obterDataComDiferencaDias;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -41,12 +42,15 @@ public class LocacaoServiceTest {
     @Mock
     private SPCService spcService;
 
+    @Mock
+    private EmailService emailService;
+
     private static Usuario usuario;
     private static List<Filme> filmes;
 
     @BeforeAll
     public static void setup() {
-        usuario = UsuarioBuilder.umUsuario().agora();
+        usuario = umUsuario().agora();
         filmes = Arrays.asList(Filme.builder()
                 .nome("De volta para o futuro")
                 .estoque(2)
@@ -131,5 +135,25 @@ public class LocacaoServiceTest {
 
         //verificação
         assertEquals("Usuário Negativado", exception.getMessage());
+        verify(spcService).possuiNegativacao(usuario);
+    }
+
+    @Test
+    public void deveEnviarEmailParaLocacoesAtrasadas() {
+        //cenario
+        Usuario usuario = umUsuario().agora();
+        Usuario usuario2 = umUsuario().comNome("fe").agora();
+        List<Locacao> locacoes = Arrays.asList(
+                umaLocacao().atrasada().comUsuario(usuario).agora(),
+                umaLocacao().comUsuario(usuario2).agora()
+        );
+        when(repository.obterLocacoesPendentes()).thenReturn(locacoes);
+
+        //ação
+        locacaoService.notificarAtrasos();
+
+        //verificacao
+        verify(emailService).notificarAtraso(usuario);
+        //verify(emailService, never()).notificarAtraso(usuario2);
     }
 }

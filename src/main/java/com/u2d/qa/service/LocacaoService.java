@@ -26,6 +26,9 @@ public class LocacaoService {
     @Autowired
     private SPCService spcService;
 
+    @Autowired
+    private EmailService emailService;
+
     public Locacao alugarFilme(Usuario usuario, List<Filme> filmes) throws LocadoraException, FilmeSemEstoqueException {
         if (usuario == null)
             throw new LocadoraException("Usuário vazio");
@@ -58,6 +61,15 @@ public class LocacaoService {
                 .build();
         repository.save(locacao);
         return locacao;
+    }
+
+    public void notificarAtrasos() {
+        List<Locacao> locacoes = repository.obterLocacoesPendentes();
+        for (Locacao locacao: locacoes) {
+            if (locacao.getDataRetorno().before(new Date())) {
+                emailService.notificarAtraso(locacao.getUsuario());
+            }
+        }
     }
 
     private void aplicaDesconto(AtomicInteger i, Filme filme) {
